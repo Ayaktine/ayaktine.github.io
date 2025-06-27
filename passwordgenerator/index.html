@@ -93,6 +93,62 @@
     input:checked + .slider:before {
       transform: translateX(16px);
     }
+    #toast {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      z-index: 999;
+    }
+    #toast.show {
+      opacity: 1;
+    }
+    #modalOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 998;
+    }
+    #modal {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 90%;
+      text-align: center;
+    }
+    #modal input {
+      width: 80%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    #modal button {
+      margin: 5px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #modal .confirm {
+      background-color: #28a745;
+      color: white;
+    }
+    #modal .cancel {
+      background-color: #ccc;
+    }
   </style>
 </head>
 <body>
@@ -133,12 +189,26 @@
     <button onclick="generatePassword()">產生密碼</button>
   </div>
 
+  <div id="toast">密碼已複製！</div>
+  <div id="modalOverlay">
+    <div id="modal">
+      <p>請輸入檔案名稱：</p>
+      <input type="text" id="filenameInput" placeholder="檔案名稱">
+      <br>
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="confirm" onclick="confirmSave()">確認</button>
+    </div>
+  </div>
+
   <script>
     const passwordDisplay = document.getElementById('passwordDisplay');
     const copyBtn = document.getElementById('copyBtn');
     const saveBtn = document.getElementById('saveBtn');
     const lengthInput = document.getElementById('length');
     const lengthVal = document.getElementById('lengthVal');
+    const toast = document.getElementById('toast');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const filenameInput = document.getElementById('filenameInput');
 
     lengthInput.addEventListener('input', () => {
       lengthVal.textContent = lengthInput.value;
@@ -176,7 +246,6 @@
         password += randomChar(allChars);
       }
 
-      // shuffle password
       password = [...password].sort(() => Math.random() - 0.5).join('');
       passwordDisplay.textContent = password;
       copyBtn.disabled = false;
@@ -189,21 +258,41 @@
 
     copyBtn.onclick = () => {
       navigator.clipboard.writeText(passwordDisplay.textContent);
-      alert("密碼已複製!");
+      showToast("密碼已複製！");
     };
 
     saveBtn.onclick = () => {
-      const filename = prompt("請輸入檔案名稱:");
-      if (filename) {
-        const now = new Date();
-        const ymd = now.getFullYear() + (now.getMonth()+1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0');
-        const blob = new Blob([passwordDisplay.textContent], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `${filename}_${ymd}.txt`;
-        a.click();
-      }
+      filenameInput.value = "";
+      modalOverlay.style.display = 'flex';
     };
+
+    function closeModal() {
+      modalOverlay.style.display = 'none';
+    }
+
+    function confirmSave() {
+      const filename = filenameInput.value.trim();
+      if (!filename) return;
+      const now = new Date();
+      const ymd = now.getFullYear().toString()
+        + (now.getMonth() + 1).toString().padStart(2, '0')
+        + now.getDate().toString().padStart(2, '0')
+        + now.getHours().toString().padStart(2, '0')
+        + now.getMinutes().toString().padStart(2, '0');
+      const blob = new Blob([passwordDisplay.textContent], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${filename}_${ymd}.txt`;
+      a.click();
+      closeModal();
+      showToast("檔案已下載！");
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
   </script>
 </body>
 </html>
