@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>密碼產生器</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f8;
+      margin: 0;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    #passwordDisplay {
+      background: white;
+      padding: 15px;
+      font-size: 20px;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      word-break: break-all;
+      border: 1px solid #ccc;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    button {
+      flex: 1;
+      padding: 10px;
+      margin: 0 5px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .control {
+      margin-bottom: 20px;
+    }
+    .switch-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: .2s;
+    }
+    input:checked + .slider {
+      background-color: #28a745;
+    }
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+  </style>
+</head>
+<body>
+  <h1>密碼產生器</h1>
+  <div id="passwordDisplay">請先產生密碼</div>
+
+  <div class="button-group">
+    <button id="copyBtn" disabled>複製</button>
+    <button id="saveBtn" disabled>另存txt</button>
+  </div>
+
+  <div class="control">
+    <label for="length">密碼長度: <span id="lengthVal">12</span></label>
+    <input type="range" id="length" min="8" max="20" value="12">
+  </div>
+  <div class="control switch-label">
+    <label>包含數字</label>
+    <label class="switch">
+      <input type="checkbox" id="includeNumbers" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+  <div class="control switch-label">
+    <label>包含大寫字母</label>
+    <label class="switch">
+      <input type="checkbox" id="includeUppercase" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+  <div class="control switch-label">
+    <label>包含特殊符號</label>
+    <label class="switch">
+      <input type="checkbox" id="includeSymbols">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <div style="text-align: center;">
+    <button onclick="generatePassword()">產生密碼</button>
+  </div>
+
+  <script>
+    const passwordDisplay = document.getElementById('passwordDisplay');
+    const copyBtn = document.getElementById('copyBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const lengthInput = document.getElementById('length');
+    const lengthVal = document.getElementById('lengthVal');
+
+    lengthInput.addEventListener('input', () => {
+      lengthVal.textContent = lengthInput.value;
+    });
+
+    function generatePassword() {
+      const length = +lengthInput.value;
+      const includeNumbers = document.getElementById('includeNumbers').checked;
+      const includeUppercase = document.getElementById('includeUppercase').checked;
+      const includeSymbols = document.getElementById('includeSymbols').checked;
+
+      const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+      const numbers = '0123456789';
+      const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const symbols = '!@#$%^&*()_+[]{}<>?';
+
+      let allChars = lowercase;
+      let mustInclude = [randomChar(lowercase)];
+
+      if (includeNumbers) {
+        allChars += numbers;
+        mustInclude.push(randomChar(numbers));
+      }
+      if (includeUppercase) {
+        allChars += uppercase;
+        mustInclude.push(randomChar(uppercase));
+      }
+      if (includeSymbols) {
+        allChars += symbols;
+        mustInclude.push(randomChar(symbols));
+      }
+
+      let password = mustInclude.join('');
+      for (let i = password.length; i < length; i++) {
+        password += randomChar(allChars);
+      }
+
+      // shuffle password
+      password = [...password].sort(() => Math.random() - 0.5).join('');
+      passwordDisplay.textContent = password;
+      copyBtn.disabled = false;
+      saveBtn.disabled = false;
+    }
+
+    function randomChar(str) {
+      return str[Math.floor(Math.random() * str.length)];
+    }
+
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(passwordDisplay.textContent);
+      alert("密碼已複製!");
+    };
+
+    saveBtn.onclick = () => {
+      const filename = prompt("請輸入檔案名稱:");
+      if (filename) {
+        const now = new Date();
+        const ymd = now.getFullYear() + (now.getMonth()+1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0');
+        const blob = new Blob([passwordDisplay.textContent], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${filename}_${ymd}.txt`;
+        a.click();
+      }
+    };
+  </script>
+</body>
+</html>
