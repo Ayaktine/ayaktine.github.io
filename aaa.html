@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Crypto Game</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsencrypt/bin/jsencrypt.min.js"></script>
+</head>
+<body>
+  <h1>SHA-256 測試</h1>
+  <input type="text" id="inputText" placeholder="輸入文字">
+  <button onclick="hashInput()">產生 SHA-256</button>
+  <p id="result"></p>
+
+  <script>
+    function hashInput() {
+      const input = document.getElementById("inputText").value;
+      const hash = CryptoJS.SHA256(input).toString();
+      document.getElementById("result").textContent = "SHA-256: " + hash;
+    }
+  </script>
+</body>
+</html>
