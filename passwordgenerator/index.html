@@ -234,7 +234,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = "1.0.4";
+        const CURRENT_VERSION = "1.0.5";
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -243,13 +243,15 @@
                 });
             });
         }
-        
+
         async function checkForUpdate() {
             try {
                 const res = await fetch('./version.json', { cache: 'no-store' });
                 const data = await res.json();
                 if (data.version !== CURRENT_VERSION) {
                     if (confirm("已偵測到新版本，是否重新載入？")) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(cacheNames.map(name => caches.delete(name)));
                         window.location.reload(true);
                     }
                 }
@@ -273,7 +275,7 @@
         const modalOverlay = document.getElementById('modalOverlay');
         const filenameInput = document.getElementById('filenameInput');
         const versionDisplay = document.getElementById('version');
-        
+
         versionDisplay.textContent = CURRENT_VERSION;
         lengthInput.addEventListener('input', () => {
             lengthVal.textContent = lengthInput.value;
