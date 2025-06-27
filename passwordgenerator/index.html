@@ -234,6 +234,8 @@
     </div>
 
     <script>
+        const CURRENT_VERSION = "1.0.3";
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(() => {
@@ -241,8 +243,7 @@
                 });
             });
         }
-        const CURRENT_VERSION = "1.0.2";
-
+        
         async function checkForUpdate() {
             try {
                 const res = await fetch('./version.json', { cache: 'no-store' });
