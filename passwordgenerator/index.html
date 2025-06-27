@@ -229,6 +229,9 @@
             <button class="confirm" onclick="confirmSave()">確認</button>
         </div>
     </div>
+    <div class="version">
+        版本: <div id="version"></div>
+    </div>
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -238,7 +241,7 @@
                 });
             });
         }
-        const CURRENT_VERSION = "1.0.1";
+        const CURRENT_VERSION = "1.0.2";
 
         async function checkForUpdate() {
             try {
@@ -268,7 +271,9 @@
         const toast = document.getElementById('toast');
         const modalOverlay = document.getElementById('modalOverlay');
         const filenameInput = document.getElementById('filenameInput');
-
+        const versionDisplay = document.getElementById('version');
+        
+        versionDisplay.textContent = CURRENT_VERSION;
         lengthInput.addEventListener('input', () => {
             lengthVal.textContent = lengthInput.value;
         });
