@@ -261,12 +261,19 @@
             try {
                 const res = await fetch('./version.json', { cache: 'no-store' });
                 const data = await res.json();
-                // lstVersionDisplay.textContent = data.version;
+
                 if (data.version !== CURRENT_VERSION) {
-                    if (confirm("已偵測到新版本，是否重新載入？")) {
+                    if (confirm(`已偵測到新版本(${data.version})，是否重新載入?`)) {
+                        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                            navigator.serviceWorker.getRegistrations().then(registrations => {
+                                for (let registration of registrations) {
+                                    registration.unregister();
+                                }
+                            });
+                        }
                         const cacheNames = await caches.keys();
                         await Promise.all(cacheNames.map(name => caches.delete(name)));
-                        window.location.reload(true);
+                        location.replace(location.href);
                     }
                 }
             } catch (err) {
