@@ -230,24 +230,38 @@
         </div>
     </div>
     <div class="version">
-        版本: <div id="version"></div>
+        版本: <span id="curVersion"></span>
+        最新版本: <span id="lstVersion">未知</span>
     </div>
 
     <script>
-        const CURRENT_VERSION = "1.0.5";
+        const CURRENT_VERSION = "1.0.5.B100";
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(() => {
-                    console.log('Service Worker registered');
-                });
-            });
-        }
+        const passwordDisplay = document.getElementById('passwordDisplay');
+        const copyBtn = document.getElementById('copyBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const lengthInput = document.getElementById('length');
+        const lengthVal = document.getElementById('lengthVal');
+        const toast = document.getElementById('toast');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const filenameInput = document.getElementById('filenameInput');
+        const curVersionDisplay = document.getElementById('curVersion');
+        const lstVersionDisplay = document.getElementById('lstVersion');
+        curVersionDisplay.textContent = CURRENT_VERSION;
+
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', () => {
+        //         navigator.serviceWorker.register('./sw.js').then(() => {
+        //             console.log('Service Worker registered');
+        //         });
+        //     });
+        // }
 
         async function checkForUpdate() {
             try {
                 const res = await fetch('./version.json', { cache: 'no-store' });
                 const data = await res.json();
+                lstVersionDisplay.textContent = data.version;
                 if (data.version !== CURRENT_VERSION) {
                     if (confirm("已偵測到新版本，是否重新載入？")) {
                         const cacheNames = await caches.keys();
@@ -262,21 +276,13 @@
 
         window.addEventListener('load', () => {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js');
+                navigator.serviceWorker.register('./sw.js').then(() => {
+                    console.log('Service Worker registered');
+                });
             }
             checkForUpdate();
         });
-        const passwordDisplay = document.getElementById('passwordDisplay');
-        const copyBtn = document.getElementById('copyBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        const lengthInput = document.getElementById('length');
-        const lengthVal = document.getElementById('lengthVal');
-        const toast = document.getElementById('toast');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const filenameInput = document.getElementById('filenameInput');
-        const versionDisplay = document.getElementById('version');
 
-        versionDisplay.textContent = CURRENT_VERSION;
         lengthInput.addEventListener('input', () => {
             lengthVal.textContent = lengthInput.value;
         });
