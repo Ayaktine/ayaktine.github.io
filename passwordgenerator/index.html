@@ -230,7 +230,7 @@
         </div>
     </div>
     <div class="version">
-        版本: <span id="curVersion"></span><br>
+        目前版本: <span id="curVersion"></span><br>
         最新版本: <span id="lstVersion">未知</span>
     </div>
 
@@ -261,7 +261,7 @@
             try {
                 const res = await fetch('./version.json', { cache: 'no-store' });
                 const data = await res.json();
-                lstVersionDisplay.textContent = data.version;
+                // lstVersionDisplay.textContent = data.version;
                 if (data.version !== CURRENT_VERSION) {
                     if (confirm("已偵測到新版本，是否重新載入？")) {
                         const cacheNames = await caches.keys();
