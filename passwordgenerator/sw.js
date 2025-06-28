@@ -99,6 +99,11 @@ async function handleIndexRequest(req) {
     }
 }
 
+self.addEventListener('message', event => {
+    if (event.data?.action === 'skipWaiting') {
+        self.skipWaiting();
+    }
+});
 
 // async function handleIndexRequest(req) {
 //     try {
