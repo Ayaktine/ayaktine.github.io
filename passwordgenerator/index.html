@@ -255,7 +255,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = "1.0.5.B105A";
+        const CURRENT_VERSION = "1.0.5.B105B";
 
         const btnGenPassword = document.getElementById('btnGenPassword');
         const passwordDisplay = document.getElementById('passwordDisplay');
@@ -285,17 +285,20 @@
                 lstVersionDisplay.textContent = data.version;
                 if (data.version !== CURRENT_VERSION) {
                     if (confirm(`已偵測到新版本(${data.version})，是否重新載入?`)) {
-                        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-                            navigator.serviceWorker.getRegistrations().then(registrations => {
-                                for (let registration of registrations) {
-                                    registration.unregister();
-                                }
-                            });
-                        }
-                        const cacheNames = await caches.keys();
-                        await Promise.all(cacheNames.map(name => caches.delete(name)));
-                        location.replace(location.href);
+                      location.reload();
                     }
+                    // if (confirm(`已偵測到新版本(${data.version})，是否重新載入?`)) {
+                    //     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    //         navigator.serviceWorker.getRegistrations().then(registrations => {
+                    //             for (let registration of registrations) {
+                    //                 registration.unregister();
+                    //             }
+                    //         });
+                    //     }
+                    //     const cacheNames = await caches.keys();
+                    //     await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    //     location.replace(location.href);
+                    // }
                 }
             } catch (err) {
                 console.warn("無法檢查更新版本", err);
