@@ -7,7 +7,8 @@ const FILES_TO_CACHE = [
     './manifest.json',
     './sw.js',
     './icon-192.png',
-    './icon-512.png'
+    './icon-512.png',
+    './assets/images/favicon-16x16.ico'
 ];
 
 // 安裝階段：抓取 version.json 並設定版本快取名稱
