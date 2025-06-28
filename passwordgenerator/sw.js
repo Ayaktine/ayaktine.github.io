@@ -67,19 +67,58 @@ async function handleIndexRequest(req) {
         const versionRes = await fetch('./version.json', { cache: 'no-store' });
         const data = await versionRes.json();
         const latestVersion = data.version || null;
+        const newCacheName = `pwacache-v${latestVersion}`;
 
-        if (latestVersion && `pwacache-v${latestVersion}` !== CACHE_NAME) {
-            // 新版本 ➜ 抓新 index.html 並更新快取
+        if (latestVersion && newCacheName !== CACHE_NAME) {
+            // 發現新版本：抓取新 index.html 並更新快取
             const freshRes = await fetch(req);
-            const newCache = await caches.open(`pwacache-v${latestVersion}`);
+            const newCache = await caches.open(newCacheName);
             await newCache.put(req, freshRes.clone());
+
+            // 刪除所有其他舊快取
+            const allCaches = await caches.keys();
+            await Promise.all(
+                allCaches.map(name => {
+                    if (name !== newCacheName) {
+                        return caches.delete(name);
+                    }
+                })
+            );
+
+            // 更新目前的快取名稱
+            CACHE_NAME = newCacheName;
+
             return freshRes;
         } else {
-            // 舊版或無版本 ➜ 使用快取版本
+            // 沒有新版本：回傳目前快取中的 index.html
             return caches.match('./index.html');
         }
     } catch (err) {
-        console.warn('取得 version.json 或 index.html 時發生錯誤，改用快取版本', err);
+        console.warn('取得 version.json 或 index.html 時發生錯誤，嘗試使用快取版本', err);
         return caches.match('./index.html');
     }
 }
+
+
+// async function handleIndexRequest(req) {
+//     try {
+//         const versionRes = await fetch('./version.json', { cache: 'no-store' });
+//         const data = await versionRes.json();
+//         const latestVersion = data.version || null;
+//
+//         if (latestVersion && `pwacache-v${latestVersion}` !== CACHE_NAME) {
+//             // 新版本 ➜ 抓新 index.html 並更新快取
+//             const freshRes = await fetch(req);
+//             const newCache = await caches.open(`pwacache-v${latestVersion}`);
+//             await newCache.put(req, freshRes.clone());
+//             return freshRes;
+//         } else {
+//             // 舊版或無版本 ➜ 使用快取版本
+//             return caches.match('./index.html');
+//         }
+//     } catch (err) {
+//         console.warn('取得 version.json 或 index.html 時發生錯誤，改用快取版本', err);
+//         return caches.match('./index.html');
+//     }
+// }
+
