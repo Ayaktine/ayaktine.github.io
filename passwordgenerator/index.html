@@ -15,6 +15,7 @@
             background: #f4f4f8;
             padding: 20px 20px 100px;
             max-width: 500px;
+            min-width: 280px;
             margin: auto;
         }
 
@@ -79,8 +80,9 @@
 
         .lengthAdjust {
             display: inline-block;
-            margin-left: 5px;
-            padding: 0 5px;
+            float: right;
+            margin: 0 0 5px 10px;
+            padding: 3px 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             cursor: pointer;
@@ -88,6 +90,7 @@
             width: 15px;
             text-align: center;
             user-select: none;
+            font-size: 18px;
         }
 
         .lengthAdjust:hover {
@@ -151,7 +154,7 @@
 
         #length {
             width: 100%;
-            max-width: 400px;
+            /*max-width: 400px;*/
             margin: 5px 0 0 0;
         }
 
@@ -266,6 +269,7 @@
             text-align: center;
             font-size: 14px;
             border-top: 1px solid #ccc;
+            user-select: none;
         }
 
     </style>
@@ -282,8 +286,8 @@
 
     <div class="control">
         <label for="length">密碼長度: <span id="lengthVal">15</span>
-            <span class="lengthAdjust" onclick="adjustLength(1)">+</span>
             <span class="lengthAdjust" onclick="adjustLength(-1)">-</span>
+            <span class="lengthAdjust" onclick="adjustLength(1)">+</span>
         </label>
         <br><input type="range" id="length" min="8" max="25" value="15">
     </div>
@@ -328,7 +332,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = "1.0.7.2";
+        const CURRENT_VERSION = "1.0.7.3";
 
         const btnGenPassword = document.getElementById('btnGenPassword');
         const passwordDisplay = document.getElementById('passwordDisplay');
@@ -400,6 +404,8 @@
 
             // 計算新值並確保在範圍內
             const currentValue = parseInt(lengthInput.value);
+            if(currentValue >= max && delta >= 0) return;
+            if(currentValue <= min && delta <= 0) return;
             const newValue = Math.min(Math.max(currentValue + delta, min), max);
 
             // 更新兩個輸入元素的值
